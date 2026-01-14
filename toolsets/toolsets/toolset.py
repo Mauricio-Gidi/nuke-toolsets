@@ -155,8 +155,14 @@ class ToolsetNK(ToolsetBase):
         """
         Execute the toolset by inserting it into the DAG (Nuke node graph).
         """
-        if nuke:
+        if not nuke:
+            raise RuntimeError("Nuke is not available. This toolset can only run inside Nuke.")
+        if not os.path.isfile(self.toolset_file):
+            raise RuntimeError(f"Missing toolset file:\n{self.toolset_file}")
+        try:
             nuke.nodePaste(self.toolset_file)
+        except Exception as e:
+            raise RuntimeError(f"Failed to insert Nuke toolset:\n{e}") from e
 
 
     def toolset_type(self):
@@ -170,11 +176,16 @@ class ToolsetNK(ToolsetBase):
     
 
     def update_toolset_data(self, toolset_data=None):
-        """Override the .nk toolset file"""
-        if nuke:
-            if nuke.selectedNodes():
-                path = os.path.join(self.root, "toolset.nk")
-                nuke.nodeCopy(path)
+        """Override the .nk toolset file from the current node selection."""
+        if not nuke:
+            raise RuntimeError("Nuke is not available. This toolset can only run inside Nuke.")
+        if not nuke.selectedNodes():
+            raise ValueError("Select at least one node to overwrite this Nuke toolset.")
+        path = os.path.join(self.root, "toolset.nk")
+        try:
+            nuke.nodeCopy(path)
+        except Exception as e:
+            raise RuntimeError(f"Failed to write toolset.nk:\n{e}") from e
 
     def get_summary_text(self, top_n: int = 10) -> str:
         """
@@ -274,6 +285,9 @@ class ToolsetPY(ToolsetBase):
         # Absolute path to the Python file that defines an execute() function.
         module_path = self.toolset_file
 
+        if not os.path.isfile(module_path):
+            raise RuntimeError(f"Missing Python toolset file:\n{module_path}")
+
         # Create an import spec that instructs Python to load code from module_path and bind it under unique_name.
         spec = importlib.util.spec_from_file_location(unique_name, module_path)
 
@@ -292,7 +306,13 @@ class ToolsetPY(ToolsetBase):
             spec.loader.exec_module(module)
 
             # Call the toolset's public entry point. This is the user's code.
-            module.execute()
+            execute_fn = getattr(module, "execute", None)
+            if not callable(execute_fn):
+                raise RuntimeError("Python toolsets must define a top-level execute() function.")
+            try:
+                execute_fn()
+            except Exception as e:
+                raise RuntimeError(f"Toolset execute() failed:\n{e}") from e
 
         finally:
             # Remove the temporary module from the cache to avoid stale reuse on subsequent runs of other toolsets with different files.

@@ -41,6 +41,7 @@ class ToolsetsLoader:
 
     def load(self):
         self._toolsets = {}
+        self._load_errors = []
         if not os.path.isdir(self.toolsets_root):
             return
     
@@ -53,7 +54,12 @@ class ToolsetsLoader:
                 toolset_root = os.path.join(user_root, toolset_name)
                 if (not os.path.isdir(toolset_root) or toolset_name.startswith(IGNORE) or toolset_name == ".DS_Store"):
                     continue
-                self._toolsets[user_name].append(self._toolsets_factory.create(toolset_root))
+                try:
+                    toolset = self._toolsets_factory.create(toolset_root)
+                except Exception as e:
+                    self._load_errors.append((toolset_root, str(e)))
+                    continue
+                self._toolsets[user_name].append(toolset)
 
 
 
@@ -73,6 +79,11 @@ class ToolsetsLoader:
             list[str]: Sequence of user names in the toolsets root directory.
         """
         return list(self._toolsets.keys())
+
+
+    def get_load_errors(self):
+        """Return errors encountered during load() as a list of (toolset_root, message)."""
+        return list(self._load_errors)
 
 
     def get_toolset_by(self, name = "", tags = None, description = "", user=ALL):

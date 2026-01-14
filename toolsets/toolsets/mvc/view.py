@@ -7,7 +7,7 @@ Qt views composing the Toolsets interface.
 No business logic; controllers drive behavior.
 """
 
-from PySide2 import QtWidgets, QtCore
+from toolsets.qt_compat import QtWidgets, QtCore, ESC_KEY
 
 from toolsets.config import ACCENT_COLOR
 from toolsets.mvc.widgets import ToolsetInfoWidget
@@ -98,7 +98,7 @@ class View(QtWidgets.QWidget):
             event (QtCore.QEvent): The event that got triggered.
         """
         key = event.key()
-        if key == QtCore.Qt.Key_Escape:
+        if int(key) == ESC_KEY:
             self.close()
 
 
@@ -170,7 +170,7 @@ class AddNewToolsetView(QtWidgets.QWidget):
             event (QtCore.QEvent): The event that got triggered.
         """
         key = event.key()
-        if key == QtCore.Qt.Key_Escape:
+        if int(key) == ESC_KEY:
             self.close()
 
 

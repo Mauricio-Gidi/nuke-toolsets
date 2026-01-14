@@ -7,7 +7,7 @@ Controllers that wire the UI to the models.
   and calls the appropriate saver, with simple user feedback.
 """
 
-from PySide2 import QtWidgets, QtGui
+from toolsets.qt_compat import QtWidgets, QtGui
 from toolsets import config
 
 try:
@@ -34,6 +34,16 @@ class Controller:
         self.view = view
         self.model = model
         self.edit_mode = False
+
+        # Edge case: TOOLSETS_ROOT missing/invalid.
+        # Show a clear error but allow the UI to stay open.
+        import os
+        if not os.path.isdir(config.TOOLSETS_ROOT):
+            self._error(
+                "Toolsets root not found",
+                f"Toolsets folder does not exist:\n\n{config.TOOLSETS_ROOT}\n\n"
+                "Create it or set NUKE_TOOLSETS_ROOT to a valid folder."
+            )
         self.populate_user_list()
         self.populate_toolsets_list()
         self.load_toolset_info()
@@ -96,7 +106,7 @@ class Controller:
         
         self.view.toolset_info_widget.label_title.setText(toolset.name)
         self.view.toolset_info_widget.label_user.setText(toolset.user)
-        self.view.toolset_info_widget.label_tags.setText(", ".join(toolset.meta.get("tags", [])))
+        self.view.toolset_info_widget.label_tags.setText(self._format_tags(toolset.meta.get("tags")))
         self.view.toolset_info_widget.text_info.setText(toolset.meta.get("description", ""))
 
 
@@ -135,12 +145,17 @@ class Controller:
     def insert_toolset(self):
         """
         Insert/Execute the currently selected toolset.
+
+        Shows a clear error message instead of crashing.
         """
         toolset = self.selected_toolset
-        if toolset == None:
+        if toolset is None:
+            self._error("No toolset selected", "Select a toolset first.")
             return
-        toolset.execute()
-
+        try:
+            toolset.execute()
+        except Exception as e:
+            self._error("Toolset failed", f"'{toolset.name}' could not run.\n\n{e}")
 
     def on_edit_save_clicked(self):
         if not self.edit_mode:
@@ -170,7 +185,7 @@ class Controller:
             toolset_info_widget.text_script.setPlainText(self.model.get_toolset_source(toolset))
             toolset_info_widget.text_script.setReadOnly(True)
 
-        toolset_info_widget.label_tags_edit.setText(", ".join(toolset.meta.get("tags", [])))
+        toolset_info_widget.label_tags_edit.setText(self._format_tags(toolset.meta.get("tags")))
         self.edit_mode = True
 
         self.focus_on_widget(toolset_info_widget, True)

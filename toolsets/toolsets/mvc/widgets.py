@@ -5,7 +5,7 @@ Currently includes `ToolsetInfoWidget`, which renders toolset metadata,
 a code/ASCII preview area, and action buttons for Insert, Edit, Save, and Cancel.
 """
 
-from PySide2 import QtWidgets, QtCore, QtGui
+from toolsets.qt_compat import QtWidgets, QtCore, QtGui, QShortcut, make_save_sequence, make_escape_sequence
 from toolsets.config import ACCENT_COLOR
 
 
@@ -88,11 +88,11 @@ class ToolsetInfoWidget(QtWidgets.QWidget):
 
     def _create_shortcuts(self):
         # Ctrl+S -> Save (use standard Save key sequence)
-        shortcut_save = QtWidgets.QShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Save), self)
+        shortcut_save = QShortcut(make_save_sequence(), self)
         shortcut_save.activated.connect(lambda: self.save_requested.emit())
 
         # Esc -> Cancel
-        shortcut_escape = QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Escape), self)
+        shortcut_escape = QShortcut(make_escape_sequence(), self)
         shortcut_escape.activated.connect(lambda: self.cancel_requested.emit())
 
     def enter_edit_mode(self):

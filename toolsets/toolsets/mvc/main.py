@@ -10,7 +10,9 @@ from toolsets.mvc import controller, model, view
 from toolsets import saver
 
 VIEW = None
+CONTROLLER = None
 ADD_NEW_TOOLSET_VIEW = None
+ADD_NEW_TOOLSET_CONTROLLER = None
 
 
 def show():
@@ -18,12 +20,12 @@ def show():
     Show the toolsets main GUI.
     Instantiates the main view, model, and controller.
     """
-    global VIEW
+    global VIEW, CONTROLLER
     VIEW = view.View()
     VIEW.raise_()
     VIEW.show()
     model_ = model.Model()
-    controller.Controller(VIEW, model_)
+    CONTROLLER = controller.Controller(VIEW, model_)
 
 
 
@@ -44,12 +46,12 @@ def show_add_new_toolset(saver_type):
         raise KeyError(
             f"No such saver type implemented: {saver_type}. Choose from {list(saver_classes.keys())}"
         )
-    global ADD_NEW_TOOLSET_VIEW
+    global ADD_NEW_TOOLSET_VIEW, ADD_NEW_TOOLSET_CONTROLLER
     ADD_NEW_TOOLSET_VIEW = view.AddNewToolsetView()
     ADD_NEW_TOOLSET_VIEW.raise_()
     ADD_NEW_TOOLSET_VIEW.show()
     model_ = model.AddNewToolsetModel(saver_class)
-    controller.AddNewToolsetViewController(
+    ADD_NEW_TOOLSET_CONTROLLER = controller.AddNewToolsetViewController(
         ADD_NEW_TOOLSET_VIEW,
         model_,
         saver_type
