@@ -1,18 +1,10 @@
-"""toolsets.config
-
+"""
 Central configuration for the Toolsets system.
 
-Defines shared constants used by UI and non-UI modules:
-- TOOLSETS_ROOT: base directory that contains per-user toolsets (storage for data.json + toolset files),
-- ICONS_ROOT and ICONS: paths to PNG icons per toolset type,
-- ACCENT_COLOR: primary UI accent color used by Qt stylesheets.
-
-Configuration notes:
-- You can override TOOLSETS_ROOT with the environment variable NUKE_TOOLSETS_ROOT.
-- The default TOOLSETS_ROOT is ~/.nuke/toolsets_data (separate from the plugin install folder).
+- TOOLSETS_ROOT: base directory that contains per-user toolsets.
+  Override with NUKE_TOOLSETS_ROOT.
+- ICONS: paths to icons used by the UI.
 """
-
-from __future__ import annotations
 
 import os
 
@@ -21,21 +13,17 @@ ENV_TOOLSETS_ROOT = "NUKE_TOOLSETS_ROOT"
 
 
 def _default_toolsets_root() -> str:
+    """Default to a per-user folder under ~/.nuke that does not clash with plugin install paths."""
     return os.path.join(os.path.expanduser("~"), ".nuke", "toolsets_data")
 
 
 # Absolute path that contains all user toolsets.
-# Priority:
-# 1) NUKE_TOOLSETS_ROOT env var
-# 2) Default: ~/.nuke/toolsets_data
 TOOLSETS_ROOT = os.path.normpath(os.environ.get(ENV_TOOLSETS_ROOT) or _default_toolsets_root())
 
+# Ignore users/toolsets folders that start with these prefixes (e.g. _temp, .cache).
+IGNORE_PREFIXES = ("_", ".")
 
-# Folder/file name prefixes to ignore while scanning TOOLSETS_ROOT.
-# str.startswith() accepts a tuple of prefixes.
-IGNORE = (".", "_")
-
-# Special value for "all users" filter.
+# Constant to represent all users (used for filtering).
 ALL = "ALL"
 
 

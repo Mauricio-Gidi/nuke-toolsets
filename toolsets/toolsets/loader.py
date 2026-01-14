@@ -12,7 +12,7 @@ No Nuke API calls here. Pure filesystem and Python logic.
 
 import os
 
-from .config import TOOLSETS_ROOT, IGNORE, ALL
+from .config import TOOLSETS_ROOT, IGNORE_PREFIXES, ALL
 from .toolset import ToolsetFactory
 
 
@@ -41,23 +41,22 @@ class ToolsetsLoader:
 
     def load(self):
         self._toolsets = {}
-        self._load_errors = []
         if not os.path.isdir(self.toolsets_root):
             return
     
         for user_name in os.listdir(self.toolsets_root):
             user_root = os.path.join(self.toolsets_root, user_name)
-            if not os.path.isdir(user_root) or user_name.startswith(IGNORE) or user_name == ".DS_Store":
+            if not os.path.isdir(user_root) or user_name.startswith(IGNORE_PREFIXES) or user_name == ".DS_Store":
                 continue
             self._toolsets[user_name] = []
             for toolset_name in os.listdir(user_root):
                 toolset_root = os.path.join(user_root, toolset_name)
-                if (not os.path.isdir(toolset_root) or toolset_name.startswith(IGNORE) or toolset_name == ".DS_Store"):
+                if (not os.path.isdir(toolset_root) or toolset_name.startswith(IGNORE_PREFIXES) or toolset_name == ".DS_Store"):
                     continue
                 try:
                     toolset = self._toolsets_factory.create(toolset_root)
-                except Exception as e:
-                    self._load_errors.append((toolset_root, str(e)))
+                except Exception:
+                    # Skip malformed toolset folders (missing files, bad json, etc.).
                     continue
                 self._toolsets[user_name].append(toolset)
 
@@ -79,11 +78,6 @@ class ToolsetsLoader:
             list[str]: Sequence of user names in the toolsets root directory.
         """
         return list(self._toolsets.keys())
-
-
-    def get_load_errors(self):
-        """Return errors encountered during load() as a list of (toolset_root, message)."""
-        return list(self._load_errors)
 
 
     def get_toolset_by(self, name = "", tags = None, description = "", user=ALL):

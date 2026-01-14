@@ -53,7 +53,7 @@ This repo is structured as a “drop-in” Nuke plugin folder.
 1. Copy the repo’s **`toolsets/`** folder into your Nuke `.nuke` directory:
 
 - **Windows**: `%USERPROFILE%\.nuke\toolsets\`
-- **macOS/Linux**: `~/.nuke/toolsets/`
+- **macOS/Linux**: `~/.nuke/toolsets_data/`
 
 2. Restart Nuke.
 3. Use: **`Scripts > Toolsets > Show`**
@@ -88,7 +88,7 @@ toolsets/               # copy this folder into ~/.nuke/
 ### Default root
 By default, toolsets are stored in:
 
-- `~/.nuke/toolsets`
+- `~/.nuke/toolsets_data_data`
 
 ### Layout
 ```
@@ -118,7 +118,7 @@ You can override the default storage location using:
 
 If the env var is not set, the tool falls back to:
 
-- `~/.nuke/toolsets`
+- `~/.nuke/toolsets_data_data`
 
 ---
 

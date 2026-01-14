@@ -155,14 +155,8 @@ class ToolsetNK(ToolsetBase):
         """
         Execute the toolset by inserting it into the DAG (Nuke node graph).
         """
-        if not nuke:
-            raise RuntimeError("Nuke is not available. This toolset can only run inside Nuke.")
-        if not os.path.isfile(self.toolset_file):
-            raise RuntimeError(f"Missing toolset file:\n{self.toolset_file}")
-        try:
+        if nuke:
             nuke.nodePaste(self.toolset_file)
-        except Exception as e:
-            raise RuntimeError(f"Failed to insert Nuke toolset:\n{e}") from e
 
 
     def toolset_type(self):
@@ -176,16 +170,11 @@ class ToolsetNK(ToolsetBase):
     
 
     def update_toolset_data(self, toolset_data=None):
-        """Override the .nk toolset file from the current node selection."""
-        if not nuke:
-            raise RuntimeError("Nuke is not available. This toolset can only run inside Nuke.")
-        if not nuke.selectedNodes():
-            raise ValueError("Select at least one node to overwrite this Nuke toolset.")
-        path = os.path.join(self.root, "toolset.nk")
-        try:
-            nuke.nodeCopy(path)
-        except Exception as e:
-            raise RuntimeError(f"Failed to write toolset.nk:\n{e}") from e
+        """Override the .nk toolset file"""
+        if nuke:
+            if nuke.selectedNodes():
+                path = os.path.join(self.root, "toolset.nk")
+                nuke.nodeCopy(path)
 
     def get_summary_text(self, top_n: int = 10) -> str:
         """
@@ -280,13 +269,12 @@ class ToolsetPY(ToolsetBase):
     def execute(self):
 
         # Build a unique module name so multiple toolsets cannot collide
-        unique_name = f"toolset_{self.name}"
+        # Build a safe module name so toolsets cannot collide.
+        safe_name = "".join(c if c.isalnum() else "_" for c in self.name)
+        unique_name = f"toolset_{safe_name}"
 
         # Absolute path to the Python file that defines an execute() function.
         module_path = self.toolset_file
-
-        if not os.path.isfile(module_path):
-            raise RuntimeError(f"Missing Python toolset file:\n{module_path}")
 
         # Create an import spec that instructs Python to load code from module_path and bind it under unique_name.
         spec = importlib.util.spec_from_file_location(unique_name, module_path)
@@ -305,14 +293,13 @@ class ToolsetPY(ToolsetBase):
             # Execute the module's top-level code in its own namespace.
             spec.loader.exec_module(module)
 
+            if not hasattr(module, "execute") or not callable(module.execute):
+                raise AttributeError(
+                    f"Python toolset '{self.name}' must define a top-level execute() function."
+                )
+
             # Call the toolset's public entry point. This is the user's code.
-            execute_fn = getattr(module, "execute", None)
-            if not callable(execute_fn):
-                raise RuntimeError("Python toolsets must define a top-level execute() function.")
-            try:
-                execute_fn()
-            except Exception as e:
-                raise RuntimeError(f"Toolset execute() failed:\n{e}") from e
+            module.execute()
 
         finally:
             # Remove the temporary module from the cache to avoid stale reuse on subsequent runs of other toolsets with different files.
@@ -372,5 +359,6 @@ class ToolsetFactory:
                 )
             return toolset_class(toolset_root)
         raise RuntimeError(
-            f"No toolset file found in that root: {toolset_root}. Files found: {os.listdir(toolset_root) if os.path.isdir(toolset_root) else []}"
+            f"No toolset file found in that root: {toolset_root}. "
+            f"Expected toolset.nk or toolset.py. Found: {os.listdir(toolset_root) if os.path.isdir(toolset_root) else []}"
         )

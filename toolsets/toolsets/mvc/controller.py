@@ -9,6 +9,7 @@ Controllers that wire the UI to the models.
 
 from toolsets.qt_compat import QtWidgets, QtGui
 from toolsets import config
+import os
 
 try:
     import nuke
@@ -34,15 +35,13 @@ class Controller:
         self.view = view
         self.model = model
         self.edit_mode = False
-
-        # Edge case: TOOLSETS_ROOT missing/invalid.
-        # Show a clear error but allow the UI to stay open.
-        import os
         if not os.path.isdir(config.TOOLSETS_ROOT):
-            self._error(
-                "Toolsets root not found",
-                f"Toolsets folder does not exist:\n\n{config.TOOLSETS_ROOT}\n\n"
-                "Create it or set NUKE_TOOLSETS_ROOT to a valid folder."
+            QtWidgets.QMessageBox.information(
+                self.view,
+                "Toolsets",
+                "Toolsets root folder was not found.\n\n"
+                f"Path: {config.TOOLSETS_ROOT}\n\n"
+                "Set NUKE_TOOLSETS_ROOT to override.",
             )
         self.populate_user_list()
         self.populate_toolsets_list()
@@ -96,6 +95,20 @@ class Controller:
         
 
 
+
+    def _format_tags(self, tags) -> str:
+        """Return tags as a clean comma-separated string."""
+        if not tags:
+            return ""
+        if isinstance(tags, str):
+            parts = [p.strip() for p in tags.split(",") if p.strip()]
+            return ", ".join(parts)
+        try:
+            parts = [str(t).strip() for t in tags if str(t).strip()]
+            return ", ".join(parts)
+        except TypeError:
+            return str(tags).strip()
+
     def load_toolset_info(self):
         """
         Load and display toolset info for the currently active toolset.
@@ -143,19 +156,20 @@ class Controller:
 
 
     def insert_toolset(self):
-        """
-        Insert/Execute the currently selected toolset.
-
-        Shows a clear error message instead of crashing.
-        """
+        """Insert/Execute the currently selected toolset."""
         toolset = self.selected_toolset
         if toolset is None:
-            self._error("No toolset selected", "Select a toolset first.")
+            QtWidgets.QMessageBox.information(self.view, "Toolsets", "Select a toolset first.")
             return
+
         try:
             toolset.execute()
         except Exception as e:
-            self._error("Toolset failed", f"'{toolset.name}' could not run.\n\n{e}")
+            QtWidgets.QMessageBox.critical(
+                self.view,
+                "Toolset error",
+                f"Failed to run '{toolset.name}' ({toolset.toolset_type()}):\n{e}",
+            )
 
     def on_edit_save_clicked(self):
         if not self.edit_mode:
@@ -185,7 +199,7 @@ class Controller:
             toolset_info_widget.text_script.setPlainText(self.model.get_toolset_source(toolset))
             toolset_info_widget.text_script.setReadOnly(True)
 
-        toolset_info_widget.label_tags_edit.setText(self._format_tags(toolset.meta.get("tags")))
+        toolset_info_widget.label_tags_edit.setText(", ".join(toolset.meta.get("tags", [])))
         self.edit_mode = True
 
         self.focus_on_widget(toolset_info_widget, True)
@@ -217,6 +231,14 @@ class Controller:
 
         self.load_toolset_info()
         self.edit_mode = False
+        if not os.path.isdir(config.TOOLSETS_ROOT):
+            QtWidgets.QMessageBox.information(
+                self.view,
+                "Toolsets",
+                "Toolsets root folder was not found.\n\n"
+                f"Path: {config.TOOLSETS_ROOT}\n\n"
+                "Set NUKE_TOOLSETS_ROOT to override.",
+            )
 
         self.focus_on_widget(toolset_info_widget, False)
 
