@@ -55,7 +55,7 @@ This repo is structured as a “drop-in” Nuke plugin folder.
 1. Copy the repo’s **`toolsets/`** folder into your Nuke `.nuke` directory:
 
 - **Windows**: `%USERPROFILE%\.nuke\toolsets\`
-- **macOS/Linux**: `~/.nuke/toolsets_data/`
+- **macOS/Linux**: `~/.nuke/toolsets/`
 
 2. Restart Nuke.
 3. Use: **`Scripts > Toolsets > Show`**
