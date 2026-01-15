@@ -165,6 +165,9 @@ If the env var is not set, the tool falls back to:
 - Select a toolset and click **Insert**, or double-click the toolset:
   - `.nk` toolset: inserts nodes into the DAG
   - `.py` toolset: imports the file and calls `execute()`
+ 
+> ⚠️ **Safety note (Python toolsets):** `.py` toolsets execute arbitrary Python code inside Nuke.
+> Only run toolsets you trust, and review the `toolset.py` file if you didn’t create it.
 
 ### Create a new toolset
 - `Scripts > Toolsets > New Toolset > Nuke`
