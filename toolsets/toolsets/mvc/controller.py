@@ -184,6 +184,12 @@ class Controller:
                 self.attempt_save()
             except ValueError as e:
                 QtWidgets.QMessageBox.critical(self.view, "Save error", f"{e}")
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(
+                    self.view,
+                    "Save error",
+                    f"Unexpected error while saving:\n{e}",
+                )
             
         
 
@@ -298,7 +304,15 @@ class Controller:
 
 
 
-        self.model.update_toolset(toolset, new_description, new_tags_list, new_toolset_data)
+        try:
+            self.model.update_toolset(toolset, new_description, new_tags_list, new_toolset_data)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self.view,
+                "Save error",
+                f"Failed to save '{toolset.name}':\n{e}",
+            )
+            return
 
         self.restore_view_after_edit(toolset)
         
@@ -410,8 +424,20 @@ class AddNewToolsetViewController:
             QtWidgets.QMessageBox.critical(self.view, "Toolset validation error", f"{e}")
             return
         # Save
-        self.model.save_toolset(name, description, tags, toolset_data)
+        try:
+            self.model.save_toolset(name, description, tags, toolset_data)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self.view,
+                "Create error",
+                f"Failed to create new toolset '{name}':\n{e}",
+            )
+            return
+
         self.view.close()
         # Feedback
-        QtWidgets.QMessageBox.information(self.view, "Created",
-                                        f"Successfully created new toolset: '{name}'")
+        QtWidgets.QMessageBox.information(
+            self.view,
+            "Created",
+            f"Successfully created new toolset: '{name}'",
+        )
