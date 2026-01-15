@@ -32,3 +32,10 @@ def escape_keysequence():
     except Exception:  # Qt5 enum
         key = QtCore.Qt.Key_Escape
     return QtGui.QKeySequence(key)
+
+def escape_key():
+    """Return the Escape key enum (Qt5/Qt6 compatible) for event.key() comparisons."""
+    try:  # Qt6 enum
+        return QtCore.Qt.Key.Key_Escape
+    except Exception:  # Qt5 enum
+        return QtCore.Qt.Key_Escape
