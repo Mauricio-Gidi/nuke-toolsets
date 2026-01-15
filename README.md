@@ -88,7 +88,7 @@ toolsets/               # copy this folder into ~/.nuke/
 ### Default root
 By default, toolsets are stored in:
 
-- `~/.nuke/toolsets_data_data`
+- `~/.nuke/toolsets_data`
 
 ### Layout
 ```
