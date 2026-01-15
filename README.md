@@ -57,12 +57,24 @@ This repo is structured as a “drop-in” Nuke plugin folder.
 - **Windows**: `%USERPROFILE%\.nuke\toolsets\`
 - **macOS/Linux**: `~/.nuke/toolsets/`
 
-2. Restart Nuke.
-3. Use: **`Scripts > Toolsets > Show`**
+2. Add the plugin folder to Nuke’s plugin path (one-time):
+
+- Open (or create) your Nuke init file:
+  - **Windows**: `%USERPROFILE%\.nuke\init.py`
+  - **macOS/Linux**: `~/.nuke/init.py`
+
+- Add these lines:
+```py
+import nuke
+nuke.pluginAddPath("./toolsets")  # relative to your ~/.nuke folder
+```
+
+3. Restart Nuke.
+4. Use: `Scripts > Toolsets > Show`
 
 > **Important:** There are two separate folders:
 > - `~/.nuke/toolsets/` = the **plugin install** folder (this repo’s `toolsets/` folder goes here)
-> - `TOOLSETS_ROOT` (default `~/.nuke/toolsets_data/`) = where your **toolset data** lives (`<user>/<toolset_name>/...`)
+> - `NUKE_TOOLSETS_ROOT` (default `~/.nuke/toolsets_data/`) = where your **toolset data** lives (`<user>/<toolset_name>/...`)
 
 ---
 
@@ -88,6 +100,7 @@ Option B: copy the included examples into your default data folder:
 
 ```
 toolsets/               # copy this folder into ~/.nuke/
+  init.py               # Nuke init entry point
   menu.py               # Nuke menu entry point
   toolsets/             # Python package
     config.py
