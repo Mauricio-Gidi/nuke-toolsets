@@ -58,6 +58,10 @@ This repo is structured as a “drop-in” Nuke plugin folder.
 2. Restart Nuke.
 3. Use: **`Scripts > Toolsets > Show`**
 
+> **Important:** There are two separate folders:
+> - `~/.nuke/toolsets/` = the **plugin install** folder (this repo’s `toolsets/` folder goes here)
+> - `TOOLSETS_ROOT` (default `~/.nuke/toolsets_data/`) = where your **toolset data** lives (`<user>/<toolset_name>/...`)
+
 ---
 
 ## Repo layout
@@ -118,7 +122,7 @@ You can override the default storage location using:
 
 If the env var is not set, the tool falls back to:
 
-- `~/.nuke/toolsets_data_data`
+- `~/.nuke/toolsets_data`
 
 ---
 
