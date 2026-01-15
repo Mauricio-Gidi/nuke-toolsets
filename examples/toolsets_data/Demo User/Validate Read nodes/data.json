@@ -1,0 +1,10 @@
+{
+    "description": "Scans all Read nodes and reports missing folders/files. Great \u201cpipeline health check.\u201d",
+    "tags": [
+        "python",
+        "validation",
+        "read",
+        "filesystem",
+        "demo"
+    ]
+}

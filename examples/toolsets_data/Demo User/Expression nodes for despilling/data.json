@@ -1,0 +1,10 @@
+{
+    "description": "Template graph that uses Expression-based despill for green/blue screens. Great as a \u201ckeying utility\u201d toolset starter (connect your plate upstream).",
+    "tags": [
+        "demo",
+        "keying",
+        "despill",
+        "expressions",
+        "greenscreen"
+    ]
+}

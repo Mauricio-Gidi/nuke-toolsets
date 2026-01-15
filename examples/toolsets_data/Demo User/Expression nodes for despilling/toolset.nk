@@ -1,0 +1,46 @@
+set cut_paste_input [stack 0]
+version 15.2 v6
+ColorWheel {
+ inputs 0
+ gamma 0.45
+ name ColorWheel1
+ selected true
+ xpos -1055
+ ypos -170
+}
+set N8bb11700 [stack 0]
+Expression {
+ expr2 b>(r+g)/2?(r+g)/2:b
+ name ExpressionBlueDespill
+ selected true
+ xpos -989
+ ypos -62
+}
+push $N8bb11700
+Expression {
+ expr1 g>(r+b)/2?(r+b)/2:g
+ name ExpressionGreenDespill
+ selected true
+ xpos -1119
+ ypos -61
+}
+StickyNote {
+ inputs 0
+ name StickyNote2
+ tile_color 0x9b9b9bff
+ label "Use this expression to despill \na greenscreen shot."
+ note_font_size 18
+ selected true
+ xpos -1361
+ ypos -73
+}
+StickyNote {
+ inputs 0
+ name StickyNote1
+ tile_color 0x9b9b9bff
+ label "Use this expression to despill \na bluescreen shot."
+ note_font_size 18
+ selected true
+ xpos -881
+ ypos -72
+}
