@@ -64,6 +64,24 @@ This repo is structured as a “drop-in” Nuke plugin folder.
 
 ---
 
+## Quick demo (included example toolsets)
+
+This repo includes a tiny demo pack.
+
+Option A (recommended): point the tool to the examples folder:
+
+- Set `NUKE_TOOLSETS_ROOT` to:
+  - Windows: `<this_repo>\examples\toolsets_data`
+  - macOS/Linux: `<this_repo>/examples/toolsets_data`
+
+Option B: copy the included examples into your default data folder:
+
+- Copy `examples/toolsets_data/Demo User/` into:
+  - Windows: `%USERPROFILE%\.nuke\toolsets_data\`
+  - macOS/Linux: `~/.nuke/toolsets_data/`
+
+---
+
 ## Repo layout
 
 ```
@@ -83,6 +101,16 @@ toolsets/               # copy this folder into ~/.nuke/
       model.py
       view.py
       widgets.py
+
+examples/               # optional demo TOOLSETS_ROOT content
+  toolsets_data/        # point NUKE_TOOLSETS_ROOT here OR copy into your default toolsets_data
+    Demo User/
+      Validate Read nodes/
+        data.json
+        toolset.py
+      Expression nodes for despilling/
+        data.json
+        toolset.nk
 ```
 
 ---
