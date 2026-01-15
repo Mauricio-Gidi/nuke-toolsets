@@ -7,7 +7,7 @@ Controllers that wire the UI to the models.
   and calls the appropriate saver, with simple user feedback.
 """
 
-from toolsets.qt_compat import QtWidgets, QtGui
+from toolsets.qt_compat import QtWidgets, QtGui, msgbox_yes_no
 from toolsets import config
 import os
 
@@ -284,14 +284,15 @@ class Controller:
             total = sum(counts.values())
             noun = "node" if total == 1 else "nodes"
 
+            YES, NO = msgbox_yes_no()
             res = QtWidgets.QMessageBox.question(
                 self.view,
                 "Confirm Add",
                 f"Overriding toolset with the next {noun}:\n\n{names_text}",
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                QtWidgets.QMessageBox.No,
+                YES | NO,
+                NO,
             )
-            if res is not QtWidgets.QMessageBox.Yes:
+            if res != YES:
                 return
 
 
