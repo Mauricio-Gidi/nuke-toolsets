@@ -39,3 +39,13 @@ def escape_key():
         return QtCore.Qt.Key.Key_Escape
     except Exception:  # Qt5 enum
         return QtCore.Qt.Key_Escape
+
+def msgbox_yes_no():
+    """Return (YES, NO) buttons compatible with Qt5/Qt6 QMessageBox APIs."""
+    try:  # Qt6
+        YES = QtWidgets.QMessageBox.StandardButton.Yes
+        NO = QtWidgets.QMessageBox.StandardButton.No
+    except Exception:  # Qt5
+        YES = QtWidgets.QMessageBox.Yes
+        NO = QtWidgets.QMessageBox.No
+    return YES, NO
