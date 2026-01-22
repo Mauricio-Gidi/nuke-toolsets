@@ -110,6 +110,7 @@ toolsets/               # copy this folder into ~/.nuke/
     icons/
       Nuke.png
       Python.png
+      Warning.png
     mvc/
       controller.py
       main.py
@@ -233,9 +234,6 @@ If the env var is not set, the tool falls back to:
   - Python script edits persist to disk
 
 ---
-
-## Changelog
-See `CHANGELOG.md`.
 
 ## License
 MIT (see `LICENSE`).
