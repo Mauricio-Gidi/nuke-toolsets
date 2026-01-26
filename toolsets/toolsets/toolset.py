@@ -358,12 +358,6 @@ class ToolsetFactory:
     Factory that creates Toolset instances given the toolset extensions.
     """
 
-    classes = {
-        ".nk": ToolsetNK,
-        ".py": ToolsetPY,
-    }
-
-
     def create(self, toolset_root):
         """
         Create a toolset instance for the given toolset root location.
