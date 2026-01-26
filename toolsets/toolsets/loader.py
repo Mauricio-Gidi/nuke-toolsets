@@ -73,16 +73,6 @@ class ToolsetsLoader:
 
 
 
-
-    def reload(self):
-        """
-        Reload toolsets from disk.
-        Calls load() to refresh the in-memory toolset list.
-        """
-        self.load()
-
-
-
     def get_warnings(self):
         """
         Get warnings collected during the last scan.
@@ -161,26 +151,3 @@ class ToolsetsLoader:
                 matching_toolsets.append(toolset)
 
         return matching_toolsets
-
-
-
-    def get_toolset(self, user_name, toolset_name):
-        """
-        Get a single toolset by user and toolset name.
-        """
-        # Normalize inputs (tolerate stray whitespace / case)
-        user = (user_name or "").strip()
-        target = (toolset_name or "").strip().casefold()
-
-        # This raises KeyError itself if the user doesn't exist — that's fine for now.
-        user_toolsets = self.get_toolset_by(user=user)
-
-        for ts in user_toolsets:
-            if (ts.name or "").strip().casefold() == target:
-                return ts
-
-        # Toolset not found for an existing user
-        raise KeyError(
-            f"No such toolset: '{toolset_name}' for '{user_name}'. "
-            f"Choose from toolsets: {[t.name for t in user_toolsets]}"
-        )
