@@ -6,7 +6,7 @@ Models for listing, loading, and saving toolsets.
 - AddNewToolsetModel: write-path wrapper that delegates to saver classes.
 """
 
-from toolsets import loader, config, saver
+from toolsets import loader, config
 
 
 class Model:
