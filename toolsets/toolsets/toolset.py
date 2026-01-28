@@ -118,9 +118,12 @@ class ToolsetBase(abc.ABC):
         with open(self.meta_file, 'w', encoding="utf-8") as f:
             json.dump(self.meta, f, indent=4)
             f.write("\n")  # ensure trailing newline
+          
+        # Metadata now exists and is valid JSON
+        self.meta_missing = False
+        self.meta_load_error = ""
 
-
-
+  
     def get_source(self):
         """
         Return the source code of this toolset as a string.
