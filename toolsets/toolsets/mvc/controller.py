@@ -347,9 +347,6 @@ class Controller:
             if res != YES:
                 return
 
-
-
-
         try:
             self.model.update_toolset(toolset, new_description, new_tags_list, new_toolset_data)
         except Exception as e:
@@ -362,6 +359,13 @@ class Controller:
 
         self.restore_view_after_edit(toolset)
         
+        # Auto-refresh metadata warnings after Save
+        prefix = f"{toolset.user}/{toolset.name}:"
+        self.model.toolsets_loader._warnings = [
+            w for w in self.model.toolsets_loader._warnings
+            if not (w.startswith(prefix) and ("Missing data.json" in w or "Invalid data.json" in w))
+        ]
+        self.update_warnings_button()
 
 
     def filter_toolsets(self):
