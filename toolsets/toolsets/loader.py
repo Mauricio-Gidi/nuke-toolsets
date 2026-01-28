@@ -48,12 +48,12 @@ class ToolsetsLoader:
     
         for user_name in os.listdir(self.toolsets_root):
             user_root = os.path.join(self.toolsets_root, user_name)
-            if not os.path.isdir(user_root) or user_name.startswith(IGNORE_PREFIXES) or user_name == ".DS_Store":
+            if not os.path.isdir(user_root) or user_name.startswith(IGNORE_PREFIXES):
                 continue
             self._toolsets[user_name] = []
             for toolset_name in os.listdir(user_root):
                 toolset_root = os.path.join(user_root, toolset_name)
-                if (not os.path.isdir(toolset_root) or toolset_name.startswith(IGNORE_PREFIXES) or toolset_name == ".DS_Store"):
+                if (not os.path.isdir(toolset_root) or toolset_name.startswith(IGNORE_PREFIXES)):
                     continue
                 toolset = self._toolsets_factory.create(toolset_root)
                 self._toolsets[user_name].append(toolset)
