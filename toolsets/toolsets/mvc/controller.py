@@ -363,7 +363,7 @@ class Controller:
         prefix = f"{toolset.user}/{toolset.name}:"
         self.model.toolsets_loader._warnings = [
             w for w in self.model.toolsets_loader._warnings
-            if not (w.startswith(prefix) and ("Missing data.json" in w or "Invalid data.json" in w))
+            if not (w.startswith(prefix) and ("Missing data.json" in w.lower() or "Invalid data.json" in w.lower()))
         ]
         self.update_warnings_button()
 
