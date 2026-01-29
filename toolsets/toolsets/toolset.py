@@ -388,14 +388,24 @@ class ToolsetFactory:
         if not os.path.isdir(toolset_root):
             raise OSError(f"No such toolset root: {toolset_root}")
 
-        # Deterministic preference order (simplest): prefer .nk over .py.
-        # This avoids OS-dependent os.listdir ordering when both exist.
         nk_path = os.path.join(toolset_root, "toolset.nk")
         py_path = os.path.join(toolset_root, "toolset.py")
 
-        if os.path.isfile(nk_path):
+        nk_exists = os.path.isfile(nk_path)
+        py_exists = os.path.isfile(py_path)
+
+        if nk_exists and py_exists:
+            return ToolsetInvalid(
+                toolset_root,
+                error_message=(
+                    "Multiple payload files found. "
+                    "Candidates: ['toolset.nk', 'toolset.py']. "
+                    "How to fix: keep only ONE payload file (delete/rename the extra)."
+                ),
+            )
+        if nk_exists:
             return ToolsetNK(toolset_root)
-        if os.path.isfile(py_path):
+        if py_exists:
             return ToolsetPY(toolset_root)
 
         # If there is a toolset.* but with an unsupported extension, keep it visible as a warning.
