@@ -14,9 +14,10 @@ Only the execute paths touch Nuke or Python import machinery.
 
 import abc
 import importlib
-import os
 import json
+import os
 import sys
+import tokenize
 
 try:
     import nuke
@@ -134,8 +135,13 @@ class ToolsetBase(abc.ABC):
         path = self.toolset_file
         if not path or not os.path.isfile(path):
             return ""
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read()
+        try:
+            with tokenize.open(path) as f:
+                return f.read()
+        except (OSError, UnicodeError, SyntaxError):
+            # Last resort: don't crash edit mode; show something readable
+            with open(path, "rb") as bf:
+                return bf.read().decode("utf-8", errors="replace")
 
 
     @abc.abstractmethod
