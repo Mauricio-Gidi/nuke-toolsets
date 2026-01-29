@@ -200,6 +200,11 @@ class Controller:
             QtWidgets.QMessageBox.information(self.view, "Toolsets", "Select a toolset first.")
             return
 
+        if toolset.toolset_type() == "Warning":
+            msg = getattr(toolset, "error_message", None) or "Invalid toolset."
+            QtWidgets.QMessageBox.information(self.view, "Toolsets", msg)
+            return
+      
         try:
             toolset.execute()
         except Exception as e:
