@@ -65,10 +65,12 @@ class ToolsetBase(abc.ABC):
         Returns:
             str: Absolute path of the toolset's toolset file, or empty string if not found.
         """
-        for name in os.listdir(self.root):
-            if not name.startswith("toolset."):
-                continue
-            return os.path.join(self.root, name)
+        nk_path = os.path.join(self.root, "toolset.nk")
+        py_path = os.path.join(self.root, "toolset.py")
+        if os.path.isfile(nk_path):
+            return nk_path
+        if os.path.isfile(py_path):
+            return py_path
         return ""
 
 
