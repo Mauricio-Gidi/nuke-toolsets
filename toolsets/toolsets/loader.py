@@ -68,7 +68,13 @@ class ToolsetsLoader:
                     )
                 if toolset.toolset_type() == "Warning":
                     msg = getattr(toolset, "error_message", "") or "Invalid toolset folder"
-                    self._warnings.append(f"{user_name}/{toolset.name}: {msg}. Fix: add toolset.nk or toolset.py (or delete the folder).")
+
+                    if "How to fix:" in msg:
+                        self._warnings.append(f"{user_name}/{toolset.name}: {msg}")
+                    else:
+                        self._warnings.append(
+                            f"{user_name}/{toolset.name}: {msg}. Fix: add toolset.nk or toolset.py (or delete the folder)."
+                        )
 
 
 
