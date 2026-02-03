@@ -2,7 +2,7 @@
 
 A small in-studio Nuke tool that provides a Qt UI to browse toolsets stored on disk and:
 
-- **Insert Nuke toolsets** (`toolset.nk`) into the DAG
+- **Insert Nuke toolsets** (`toolset.nk`) into the nodegraph (or DAG)
 - **Run Python toolsets** (`toolset.py`) by calling a top-level `execute()`
 
 [![Demo - Nuke Toolsets MVP](media/nuke-toolsets-demo.gif)](media/nuke-toolsets-demo.gif)
