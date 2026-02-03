@@ -7,8 +7,6 @@ A small in-studio Nuke tool that provides a Qt UI to browse toolsets stored on d
 
 [![Demo - Nuke Toolsets MVP](media/nuke-toolsets-demo.gif)](media/nuke-toolsets-demo.gif)
 
----
-
 ## v0.1 scope
 
 ### Included
