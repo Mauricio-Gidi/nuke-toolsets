@@ -7,6 +7,10 @@ A small in-studio Nuke tool that provides a Qt UI to browse toolsets stored on d
 
 [![Demo - Nuke Toolsets MVP](media/nuke-toolsets-demo.gif)](media/nuke-toolsets-demo.gif)
 
+### Why it matters
+A consistent on-disk toolset library reduces duplication and makes reuse predictable across a team.  
+This tool browses a per-user structure under `NUKE_TOOLSETS_ROOT` (local or shared storage).
+
 ### Included
 - Browse users + toolsets from disk
 - Filter toolsets by **name** and **tags**
