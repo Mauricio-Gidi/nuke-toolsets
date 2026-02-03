@@ -32,15 +32,12 @@ A small in-studio Nuke tool that provides a Qt UI to browse toolsets stored on d
 
 ### Supported
 - **Nuke**: 13.x → 16+
-- **Qt bindings**:
-  - Nuke 13.x: PySide2 / Qt5 era
-  - Nuke 16+: PySide6 / Qt6 era
 - **OS**: Windows / macOS / Linux
 
 ### Tested
 - **Windows**: 13.0v10, 15.2v6, 16.0v8
 
-> Note: macOS/Linux are *supported* (cross-platform paths + Qt usage) but not validated yet.
+> Note: macOS/Linux are *supported* (cross-platform paths + Qt usage) but not tested yet.
 
 ---
 
