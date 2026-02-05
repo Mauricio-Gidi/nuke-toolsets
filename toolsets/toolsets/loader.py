@@ -60,11 +60,11 @@ class ToolsetsLoader:
 
                 # Collect scan warnings (only for the last scan).
                 if getattr(toolset, "meta_missing", False) and toolset.toolset_type() != "Warning":
-                    self._warnings.append(f"{user_name}/{toolset.name}: missing data.json. Fix: click Save to create it.")
+                    self._warnings.append(f"{user_name}/{toolset.name}: missing data.json. How to fix: click Save to create it.")
 
                 if getattr(toolset, "meta_load_error", None):
                     self._warnings.append(
-                        f"{user_name}/{toolset.name}: invalid data.json ({toolset.meta_load_error}). Fix: click Save to rewrite data.json."
+                        f"{user_name}/{toolset.name}: invalid data.json ({toolset.meta_load_error}). How to fix: click Save to rewrite data.json."
                     )
                 if toolset.toolset_type() == "Warning":
                     msg = getattr(toolset, "error_message", "") or "Invalid toolset folder"
@@ -73,7 +73,7 @@ class ToolsetsLoader:
                         self._warnings.append(f"{user_name}/{toolset.name}: {msg}")
                     else:
                         self._warnings.append(
-                            f"{user_name}/{toolset.name}: {msg}. Fix: add toolset.nk or toolset.py (or delete the folder)."
+                            f"{user_name}/{toolset.name}: {msg}. How to fix: add toolset.nk or toolset.py (or delete the folder)."
                         )
 
 
