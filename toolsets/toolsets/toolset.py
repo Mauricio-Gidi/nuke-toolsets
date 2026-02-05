@@ -408,6 +408,34 @@ class ToolsetFactory:
         if py_exists:
             return ToolsetPY(toolset_root)
 
+
+        # Case-only payload filename mismatch: may work on case-insensitive filesystems
+        try:
+            entries = os.listdir(toolset_root)
+        except Exception:
+            entries = []
+
+        lower_entries = {e.lower() for e in entries}
+
+        mismatches = []
+        for expected in ("toolset.nk", "toolset.py"):
+            if expected in lower_entries and expected not in entries:
+                # find the actual casing to show in the message (first match)
+                actual = next(e for e in entries if e.lower() == expected)
+                mismatches.append((actual, expected))
+
+        if mismatches:
+            details = ", ".join([f"'{actual}' → '{expected}'" for actual, expected in mismatches])
+            return ToolsetInvalid(
+                toolset_root,
+                error_message=(
+                    "Payload filename case mismatch. "
+                    f"Detected: {details}. "
+                    "How to fix: rename the file(s) to exactly 'toolset.nk' or 'toolset.py' (lowercase). "
+                ),
+            )
+
+
         # If there is a toolset.* but with an unsupported extension, keep it visible as a warning.
         for file_name in os.listdir(toolset_root):
             name, extension = os.path.splitext(file_name)
@@ -415,8 +443,17 @@ class ToolsetFactory:
                 continue
             return ToolsetInvalid(
                 toolset_root,
-                error_message=f"Unsupported toolset extension '{extension}'. Expected toolset.nk or toolset.py.",
+                error_message=(
+                    f"Unsupported toolset extension '{extension}'. Expected toolset.nk or toolset.py. "
+                    "How to fix: rename the payload to 'toolset.nk' or 'toolset.py' (or delete the file)."
+                ),            
             )
 
         # No toolset file at all: keep visible as a warning item.
-        return ToolsetInvalid(toolset_root, error_message="No toolset.nk or toolset.py found in this folder.")
+        return ToolsetInvalid(
+            toolset_root,
+            error_message=(
+                "No toolset.nk or toolset.py found in this folder. "
+                "How to fix: add a payload named 'toolset.nk' or 'toolset.py' (or delete the folder)."
+            ),
+        )
