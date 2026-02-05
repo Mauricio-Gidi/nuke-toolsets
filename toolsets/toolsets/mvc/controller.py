@@ -7,7 +7,7 @@ Controllers that wire the UI to the models.
   and calls the appropriate saver, with simple user feedback.
 """
 
-from toolsets.qt_compat import QtWidgets, QtGui, msgbox_yes_no
+from toolsets.qt_compat import QtWidgets, QtCore, QtGui, msgbox_yes_no
 from toolsets import config
 import os
 
@@ -112,15 +112,107 @@ class Controller:
 
 
     def show_warnings(self):
-        """Show a one-time popup listing warnings from the last scan."""
+        """Show a popup listing warnings from the last scan (with TD-actionable folder access)."""
         warnings = self.model.get_scan_warnings()
         if not warnings:
             QtWidgets.QMessageBox.information(self.view, "Toolsets - Warnings", "No warnings from the last scan.")
             return
 
-        # Keep it readable: one warning per line.
-        text = "\n".join(f"- {w}" for w in warnings)
-        QtWidgets.QMessageBox.information(self.view, "Toolsets - Warnings", text)
+        warning_dialog = QtWidgets.QDialog(self.view)
+        warning_dialog.setWindowTitle("Toolsets - Warnings")
+        warning_dialog.setModal(True)
+
+        layout = QtWidgets.QVBoxLayout(warning_dialog)
+
+        label = QtWidgets.QLabel("Warnings from the last scan:")
+        layout.addWidget(label)
+
+        list_warnings = QtWidgets.QListWidget()
+        list_warnings.addItems(warnings)
+        list_warnings.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        layout.addWidget(list_warnings)
+
+        # TD details (path) kept separate from the artist-facing line items.
+        path_row = QtWidgets.QHBoxLayout()
+        path_label = QtWidgets.QLabel("Toolset folder:")
+        path_edit = QtWidgets.QLineEdit()
+        path_edit.setReadOnly(True)
+        path_row.addWidget(path_label)
+        path_row.addWidget(path_edit)
+        layout.addLayout(path_row)
+
+        button_row = QtWidgets.QHBoxLayout()
+        btn_copy = QtWidgets.QPushButton("Copy Path")
+        btn_reveal = QtWidgets.QPushButton("Reveal Folder")
+        btn_close = QtWidgets.QPushButton("Close")
+        button_row.addWidget(btn_copy)
+        button_row.addWidget(btn_reveal)
+        button_row.addStretch()
+        button_row.addWidget(btn_close)
+        layout.addLayout(button_row)
+
+        def update_details():
+            item = list_warnings.currentItem()
+            if item is None:
+                path_edit.setText("")
+                btn_copy.setEnabled(False)
+                btn_reveal.setEnabled(False)
+                return
+
+            warning_text = item.text()
+            toolset = self._find_toolset_for_warning(warning_text)
+            path = getattr(toolset, "root", "") if toolset else ""
+
+            path_edit.setText(path or "")
+            btn_copy.setEnabled(bool(path))
+            btn_reveal.setEnabled(bool(path))
+
+        list_warnings.currentItemChanged.connect(lambda *_: update_details())
+        btn_copy.clicked.connect(lambda: self._copy_to_clipboard(path_edit.text().strip()))
+        btn_reveal.clicked.connect(lambda: self._reveal_in_file_browser(path_edit.text().strip()))
+        btn_close.clicked.connect(lambda: warning_dialog.accept())
+
+        # Default selection.
+        list_warnings.setCurrentRow(0)
+        update_details()
+
+        #warning_dialog.resize(800, 420)
+        warning_dialog.exec_() if hasattr(warning_dialog, "exec_") else warning_dialog.exec()
+
+
+    def _find_toolset_for_warning(self, warning_text):
+        """
+        Map a scan warning line back to its Toolset object.
+        """
+        # "user/toolset" 
+        prefix = warning_text.split(":", 1)[0].strip()
+        if "/" not in prefix:
+            return None
+        user, name = prefix.split("/", 1)
+
+        for t in self.model.get_all_toolsets():
+            if getattr(t, "user", None) == user and getattr(t, "name", None) == name:
+                return t
+        return None
+
+
+    def _copy_to_clipboard(self, text):
+        if not text:
+            return
+        try:
+            QtWidgets.QApplication.clipboard().setText(text)
+        except Exception:
+            pass
+
+
+    def _reveal_in_file_browser(self, path):
+        """Open a folder in the OS file browser (Explorer/Finder/Files)."""
+        if not path:
+            return
+        try:
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(path))
+        except Exception:
+            pass
 
 
     def _format_tags(self, tags) -> str:
@@ -136,28 +228,39 @@ class Controller:
         except TypeError:
             return str(tags).strip()
 
+
     def load_toolset_info(self):
         """
-        Load and display toolset info for the currently active toolset.
+        Load and display toolset info for the currently selected toolset.
+        Updates the info panel and enables/disables Insert based on toolset validity.
         """
         toolset = self.selected_toolset
-        if toolset == None:
+        if toolset is None:
             return
-        
+
+        is_warning_toolset = (toolset.toolset_type() == "Warning")
+        warning_message = getattr(toolset, "error_message", None) or "No toolset file."
+
         self.view.toolset_info_widget.label_title.setText(toolset.name)
         self.view.toolset_info_widget.label_user.setText(toolset.user)
         self.view.toolset_info_widget.label_tags.setText(self._format_tags(toolset.meta.get("tags")))
-        self.view.toolset_info_widget.text_info.setText(toolset.meta.get("description", ""))
 
-        # Make invalid toolsets non-runnable
-        btn_insert = self.view.toolset_info_widget.button_insert
-        if toolset.toolset_type() == "Warning":
-            msg = getattr(toolset, "error_message", None) or "No toolset file."
-            btn_insert.setEnabled(False)
-            btn_insert.setToolTip(msg)
+        if is_warning_toolset:
+            # Artist summary + TD details (path) shown directly in the info panel.
+            self.view.toolset_info_widget.text_info.setPlainText(
+                f"{warning_message}\n\nDetails:\nPath: {toolset.root}"
+            )
         else:
-            btn_insert.setEnabled(True)
-            btn_insert.setToolTip("Insert/Execute toolset")
+            self.view.toolset_info_widget.text_info.setText(toolset.meta.get("description", ""))
+
+        # Make invalid toolsets non-runnable.
+        insert_button = self.view.toolset_info_widget.button_insert
+        if is_warning_toolset:
+            insert_button.setEnabled(False)
+            insert_button.setToolTip(warning_message)
+        else:
+            insert_button.setEnabled(True)
+            insert_button.setToolTip("Insert/Execute toolset")
 
 
     def create_signals(self):
