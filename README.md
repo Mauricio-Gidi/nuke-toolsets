@@ -1,6 +1,4 @@
 # Nuke Toolsets (v0.1)
-Links: [Portfolio](https://mauricio-gidi.github.io) | [GitHub](https://github.com/Mauricio-Gidi) | [LinkedIn](https://www.linkedin.com/in/mauricio-gidi-29689b22a/)
-
 
 A small in-studio Nuke tool that provides a Qt UI to browse toolsets stored on disk and:
 
@@ -8,6 +6,7 @@ A small in-studio Nuke tool that provides a Qt UI to browse toolsets stored on d
 - **Run Python toolsets** (`toolset.py`) by calling a top-level `execute()`
 
 [![Demo - Nuke Toolsets MVP](media/nuke-toolsets-demo.gif)](media/nuke-toolsets-demo.gif)
+Links: [Portfolio](https://mauricio-gidi.github.io) | [GitHub](https://github.com/Mauricio-Gidi) | [LinkedIn](https://www.linkedin.com/in/mauricio-gidi-29689b22a/)
 
 ### Why it matters
 A consistent on-disk toolset library reduces duplication and makes reuse predictable across a team.  
