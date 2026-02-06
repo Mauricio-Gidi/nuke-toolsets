@@ -1,7 +1,7 @@
 # Nuke Toolsets
 Links: [Portfolio](https://mauricio-gidi.github.io) | [GitHub](https://github.com/Mauricio-Gidi) | [LinkedIn](https://www.linkedin.com/in/mauricio-gidi-29689b22a/)
 
-A small in-studio Nuke tool that provides a Qt UI to browse toolsets stored on disk and:
+Browse toolsets stored on disk in a Qt user interface: insert .nk toolsets or run .py toolsets via a standard execute() entry point.
 
 - **Insert Nuke toolsets** (`toolset.nk`) into the nodegraph (or DAG)
 - **Run Python toolsets** (`toolset.py`) by calling a top-level `execute()`
