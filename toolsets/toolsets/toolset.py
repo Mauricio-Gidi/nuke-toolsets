@@ -415,6 +415,7 @@ class ToolsetFactory:
         except Exception:
             entries = []
 
+        entries = sorted(entries, key=lambda name: (name.lower(), name))
         lower_entries = {e.lower() for e in entries}
 
         mismatches = []
@@ -437,7 +438,7 @@ class ToolsetFactory:
 
 
         # If there is a toolset.* but with an unsupported extension, keep it visible as a warning.
-        for file_name in os.listdir(toolset_root):
+        for file_name in entries:
             name, extension = os.path.splitext(file_name)
             if name != "toolset":
                 continue
