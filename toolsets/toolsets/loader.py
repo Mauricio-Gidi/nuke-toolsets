@@ -46,12 +46,12 @@ class ToolsetsLoader:
         if not os.path.isdir(self.toolsets_root):
             return
     
-        for user_name in os.listdir(self.toolsets_root):
+        for user_name in sorted(os.listdir(self.toolsets_root), key=lambda name: (name.lower(), name)):
             user_root = os.path.join(self.toolsets_root, user_name)
             if not os.path.isdir(user_root) or user_name.startswith(IGNORE_PREFIXES):
                 continue
             self._toolsets[user_name] = []
-            for toolset_name in os.listdir(user_root):
+            for toolset_name in sorted(os.listdir(user_root), key=lambda name: (name.lower(), name)):
                 toolset_root = os.path.join(user_root, toolset_name)
                 if (not os.path.isdir(toolset_root) or toolset_name.startswith(IGNORE_PREFIXES)):
                     continue
@@ -75,8 +75,8 @@ class ToolsetsLoader:
                         self._warnings.append(
                             f"{user_name}/{toolset.name}: {msg}. How to fix: add toolset.nk or toolset.py (or delete the folder)."
                         )
-
-
+        # Ensure stable warning ordering across rescans.
+        self._warnings.sort(key=lambda message: (message.lower(), message))
 
 
     def get_warnings(self):
@@ -156,4 +156,12 @@ class ToolsetsLoader:
 
                 matching_toolsets.append(toolset)
 
-        return matching_toolsets
+        return sorted(
+            matching_toolsets,
+            key=lambda toolset: (
+                (getattr(toolset, 'name', '') or '').lower(),
+                (getattr(toolset, 'name', '') or ''),
+                (getattr(toolset, 'root', '') or '').lower(),
+                (getattr(toolset, 'root', '') or ''),
+            ),
+        )
