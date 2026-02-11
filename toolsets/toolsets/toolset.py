@@ -101,7 +101,38 @@ class ToolsetBase(abc.ABC):
 
         try:
             with open(self.meta_file, "r", encoding="utf-8") as file:
-                return json.load(file)
+                loaded_meta = json.load(file)
+
+            # Strict metadata schema validation.
+            if not isinstance(loaded_meta, dict):
+                self.meta_load_error = (
+                    "SchemaError: data.json must be a JSON object with keys 'description' and 'tags'."
+                )
+                return {}
+
+            missing_keys = [key for key in ("description", "tags") if key not in loaded_meta]
+            if missing_keys:
+                self.meta_load_error = (
+                    "SchemaError: missing required key(s): " + ", ".join(missing_keys)
+                )
+                return {}
+
+            if not isinstance(loaded_meta.get("description"), str):
+                self.meta_load_error = "SchemaError: 'description' must be a string."
+                return {}
+
+            tags_value = loaded_meta.get("tags")
+            if (
+                not isinstance(tags_value, list)
+                or not all(isinstance(tag, str) for tag in tags_value)
+            ):
+                self.meta_load_error = "SchemaError: 'tags' must be a list of strings."
+                return {}
+
+            # Valid schema.
+            self.meta_load_error = None
+            return loaded_meta
+
         except Exception as e:
             # Corrupt/invalid metadata should not block the toolset from loading.
             self.meta_load_error = f"{type(e).__name__}: {e}"
