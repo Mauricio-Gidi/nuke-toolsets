@@ -230,7 +230,6 @@ If the env var is not set, the tool falls back to:
 ---
 
 ## License
-MIT (see `LICENSE`).
 
-## Author
-Mauricio Gidi
+MIT License. See [LICENSE](LICENSE).
+
