@@ -27,11 +27,6 @@ This tool browses a per-user structure under `NUKE_TOOLSETS_ROOT` (local or shar
   - Script editing for Python toolsets
   - Overwrite `.nk` payload from current selection (with confirmation)
 
-### Not included (non-goals)
-- No packaging/pip installer
-- No network sync / publishing workflows
-- No automated test suite (manual checklist only)
-
 ---
 
 ## Compatibility
